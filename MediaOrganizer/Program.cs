@@ -26,11 +26,10 @@ namespace MediaOrganizer
             stopwatch.Stop();
 
             TimeSpan timespan = TimeSpan.FromMilliseconds(stopwatch.ElapsedMilliseconds);
-            string totalTimeElapsed = string.Format("{0:D2}h:{1:D2}m:{2:D2}s:{3:D3}ms",
-                                    timespan.Hours,
-                                    timespan.Minutes,
-                                    timespan.Seconds,
-                                    timespan.Milliseconds);
+            string totalTimeElapsed = string.Format("{0:D2}hour(s) {1:D2}minute(s) {2:D2}second(s)",
+                                        timespan.Hours,
+                                        timespan.Minutes,
+                                        timespan.Seconds);
 
             Console.WriteLine("-------------------------------------------");
             Console.WriteLine("Scan Report");
