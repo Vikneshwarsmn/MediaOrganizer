@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Globalization;
@@ -28,17 +29,30 @@ namespace MediaOrganizer
             Console.WriteLine("Scan Path: " + photosSourcePath);
             Console.WriteLine("Scanning Started.");
 
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+
             GetDirectoryReadyForScanning(photosSourcePath);
+            stopwatch.Stop();
+
+            TimeSpan timespan = TimeSpan.FromMilliseconds(stopwatch.ElapsedMilliseconds);
+            string totalTimeElapsed = string.Format("{0:D2}h:{1:D2}m:{2:D2}s:{3:D3}ms",
+                                    timespan.Hours,
+                                    timespan.Minutes,
+                                    timespan.Seconds,
+                                    timespan.Milliseconds);
 
             Console.WriteLine("-------------------------------------------");
             Console.WriteLine("Scan Report");
             Console.WriteLine("Total Files Scanned: " + FILE_COUNT);
             Console.WriteLine("Total Files Copied: " + FILE_COPY_COUNT);
             Console.WriteLine("Total Data Scanned: " + GetFileSize(TOTAL_SCAN_SIZE));
+            Console.WriteLine("Total Time Taken: " + totalTimeElapsed);
 
             Console.ReadKey();
         }
 
+        #region Private Methods
         private static void GetDirectoryReadyForScanning(string folderPath)
         {
             // Start with drives if you have to search the entire computer.
@@ -264,5 +278,7 @@ namespace MediaOrganizer
 
             }
         }
+
+        #endregion
     }
 }
