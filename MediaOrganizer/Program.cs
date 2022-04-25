@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -129,8 +130,11 @@ namespace MediaOrganizer
 
                 if (!string.IsNullOrEmpty(collectionsPath))
                 {
-                    FileCreatedMetadata fileTakenMetadata = GetImageCreatedDate(fileToCopy);
-                    collectionsPath = Path.Combine(collectionsPath, fileTakenMetadata.Year, fileTakenMetadata.Month);
+                    FileCreatedMetadata fileCreatedMetadata = GetImageCreatedDate(fileToCopy);
+                    if (fileCreatedMetadata != null)
+                    {
+                        collectionsPath = Path.Combine(collectionsPath, fileCreatedMetadata.Year, fileCreatedMetadata.Month + "." + fileCreatedMetadata.MonthName);
+                    }
                 }
             }
             else if (mediaType.Equals(FileType.Video))
@@ -166,19 +170,22 @@ namespace MediaOrganizer
                         }
                         else
                         {
-                            string[] takenDateMetadata = DateTime.Parse(dateTaken).ToString("yyyy-MM-dd").Split('-');
+                            string[] fileCreatedMetadata = DateTime.Parse(dateTaken).ToString("yyyy-MM-dd").Split('-');
 
                             return new FileCreatedMetadata()
                             {
-                                Year = takenDateMetadata[0],
-                                Month = takenDateMetadata[1],
-                                Day = takenDateMetadata[2]
+                                Year = fileCreatedMetadata[0],
+                                Month = fileCreatedMetadata[1],
+                                MonthName = CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(Convert.ToInt32(fileCreatedMetadata[1])),
+                                Day = fileCreatedMetadata[2]
                             };
                         }
                     }
+
+
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return null;
             }
