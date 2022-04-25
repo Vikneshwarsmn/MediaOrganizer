@@ -51,6 +51,9 @@
     <Compile Include="Constants.cs" />
     <Compile Include="Configurations.cs" />
     <Compile Include="FileCreatedMetadata.cs" />
+    <Compile Include="FileProperties.cs" />
+    <Compile Include="ImagePropertyRetriever.cs" />
+    <Compile Include="MediaValidator.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
