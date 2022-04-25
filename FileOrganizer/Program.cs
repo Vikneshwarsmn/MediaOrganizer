@@ -10,10 +10,6 @@ namespace FileOrganizer
 {
     class Program
     {
-        private static readonly bool IsCopy = false;
-        private static readonly string SourcePath = @"H:\YandexDisk\My.Media.Collection\2016\12.December\Andaman & Nicobar";
-        private static readonly string PhotosCollectionPath = @"F:\HoneyMoon\Photos";
-        private static readonly string VideosCollectionPath = @"F:\HoneyMoon\Videos";
         private static long FILE_COUNT = 0;
         private static long FILE_COPY_COUNT = 0;
         private static long TOTAL_SCAN_SIZE = 0;
@@ -24,12 +20,14 @@ namespace FileOrganizer
 
         static void Main(string[] args)
         {
+            string photosSourcePath = Configurations.PhotosSourcePath;
+
             Console.Title = "FileOrganizer";
 
-            Console.WriteLine("Scan Path: " + SourcePath);
+            Console.WriteLine("Scan Path: " + photosSourcePath);
             Console.WriteLine("Scanning Started.");
 
-            GetDirectoryReadyForScanning(SourcePath);
+            GetDirectoryReadyForScanning(photosSourcePath);
 
             Console.WriteLine("-------------------------------------------");
             Console.WriteLine("Scan Report");
@@ -59,14 +57,8 @@ namespace FileOrganizer
                 try
                 {
                     files = root.GetFiles("*.*");
-
-                    //var isDirectoryEmpty = !Directory.EnumerateFileSystemEntries(root.FullName).Any();
-
-                    //if (isDirectoryEmpty)
-                    //{
-                    //    Directory.Delete(root.FullName, false);
-                    //}
                 }
+
                 // This is thrown if even one of the files requires permissions greater
                 // than the application provides.
                 catch (UnauthorizedAccessException e)
@@ -131,39 +123,37 @@ namespace FileOrganizer
             string collectionsPath = string.Empty;
 
             string mediaType = GetFileMediaType(fileToCopy);
-            if (mediaType.Equals("Image"))
+            if (mediaType.Equals(FileType.Photo))
             {
-                collectionsPath = PhotosCollectionPath;
+                collectionsPath = Path.Combine(Configurations.PhotosOrganizeBasePath, FileType.Photo);
+
+                if (!string.IsNullOrEmpty(collectionsPath))
+                {
+                    FileCreatedMetadata fileTakenMetadata = GetImageCreatedDate(fileToCopy);
+                    collectionsPath = Path.Combine(collectionsPath, fileTakenMetadata.Year, fileTakenMetadata.Month);
+                }
             }
-            else if (mediaType.Equals("Video"))
+            else if (mediaType.Equals(FileType.Video))
             {
-                collectionsPath = VideosCollectionPath;
+                collectionsPath = Path.Combine(Configurations.PhotosOrganizeBasePath, FileType.Video); ;
+                if (!string.IsNullOrEmpty(collectionsPath))
+                {
+                    DateTime lastModified = File.GetLastWriteTime(fileToCopy);
+                    string year = lastModified.ToString("yyyy");
+                    string month = lastModified.ToString("MM");
+                    string day = lastModified.ToString("dd");
+                    collectionsPath = Path.Combine(collectionsPath, year, month, day);
+                }
             }
 
-            if (!string.IsNullOrEmpty(collectionsPath))
-            {
-                string[] ar = GetDateTakenFromImage(fileToCopy);
-
-                DateTime lastModified = File.GetLastWriteTime(fileToCopy);
-                string year = lastModified.ToString("yyyy");
-                string month = lastModified.ToString("MM");
-                string day = lastModified.ToString("dd");
-                collectionsPath = Path.Combine(collectionsPath, year, month, day);
-                //FileCopyPath(collectionsPath, fileToCopy);
-            }
+            FileCopyPath(collectionsPath, fileToCopy);
         }
 
-        //retrieves the datetime WITHOUT loading the whole image
-        private static string[] GetDateTakenFromImage(string path)
+        /// Retrieves the datetime WITHOUT loading the whole image
+        private static FileCreatedMetadata GetImageCreatedDate(string path)
         {
             try
             {
-                //// Create an Image object. 
-                //System.Drawing.Image image = new Bitmap(@"c:\FakePhoto.jpg");
-
-                //// Get the PropertyItems property from image.
-                //PropertyItem[] propItems = image.PropertyItems;
-
                 using (FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read))
                 {
                     using (Image myImage = Image.FromStream(fs, false, false))
@@ -171,13 +161,24 @@ namespace FileOrganizer
                         PropertyItem propItem = myImage.GetPropertyItem(36867);
                         string dateTaken = r.Replace(Encoding.UTF8.GetString(propItem.Value), "-", 2);
                         if (string.IsNullOrEmpty(dateTaken))
+                        {
                             return null;
+                        }
                         else
-                            return DateTime.Parse(dateTaken).ToString("yyyy-MM-dd").Split('-');
+                        {
+                            string[] takenDateMetadata = DateTime.Parse(dateTaken).ToString("yyyy-MM-dd").Split('-');
+
+                            return new FileCreatedMetadata()
+                            {
+                                Year = takenDateMetadata[0],
+                                Month = takenDateMetadata[1],
+                                Day = takenDateMetadata[2]
+                            };
+                        }
                     }
                 }
             }
-            catch
+            catch(Exception ex)
             {
                 return null;
             }
@@ -214,15 +215,15 @@ namespace FileOrganizer
         {
             if (IsFileImage(fileToCopy))
             {
-                return "Image";
+                return FileType.Photo;
             }
             else if (IsFileVideo(fileToCopy))
             {
-                return "Video";
+                return FileType.Video;
             }
             else
             {
-                return "None";
+                return FileType.None;
             }
         }
 
@@ -247,50 +248,14 @@ namespace FileOrganizer
 
                 string fileName = Path.Combine(collectionsPath, Path.GetFileName(fileToCopy));
 
-                if (IsCopy)
-                {
-                    File.Copy(fileToCopy, fileName, true);
-                }
-                else
-                {
-                    if (FileEquals(fileToCopy, fileName))
-                    {
-                        File.Delete(fileName);
-                    }
-                    File.Move(fileToCopy, fileName);
-                }
+                File.Copy(fileToCopy, fileName, true);
+
                 FILE_COPY_COUNT++;
             }
             catch (Exception ex)
             {
 
             }
-        }
-
-        private static bool FileEquals(string path1, string path2)
-        {
-            try
-            {
-                byte[] file1 = File.ReadAllBytes(path1);
-                byte[] file2 = File.ReadAllBytes(path2);
-                if (file1.Length == file2.Length)
-                {
-                    for (int i = 0; i < file1.Length; i++)
-                    {
-                        if (file1[i] != file2[i])
-                        {
-                            return false;
-                        }
-                    }
-                    return true;
-                }
-            }
-            catch (Exception ex)
-            {
-
-            }
-
-            return false;
         }
     }
 }
