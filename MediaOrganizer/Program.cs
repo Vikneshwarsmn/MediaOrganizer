@@ -138,7 +138,7 @@ namespace MediaOrganizer
 
                     if (fileCreatedMetadata == null)
                     {
-                        fileCreatedMetadata = ImagePropertyRetriever.GetFileCreationTime(fileToCopy);
+                        fileCreatedMetadata = ImagePropertyRetriever.GetFileLastWriteTime(fileToCopy);
                     }
                     collectionsPath = Path.Combine(collectionsPath, fileCreatedMetadata.Year, fileCreatedMetadata.Month + "." + fileCreatedMetadata.MonthName);
                 }

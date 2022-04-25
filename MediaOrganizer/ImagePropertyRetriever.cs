@@ -50,9 +50,9 @@ namespace MediaOrganizer
             }
         }
 
-        public static FileCreatedMetadata GetFileCreationTime(string path)
+        public static FileCreatedMetadata GetFileLastWriteTime(string path)
         {
-            DateTime fileCreatedDate = File.GetCreationTime(path);
+            DateTime fileCreatedDate = File.GetLastWriteTime(path);
 
             string[] fileCreatedMetadata = fileCreatedDate.ToString("yyyy-MM-dd").Split('-');
 
