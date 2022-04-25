@@ -1,4 +1,4 @@
-﻿namespace FileOrganizer
+﻿namespace MediaOrganizer
 {
     public class FileCreatedMetadata
     {

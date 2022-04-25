@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Configuration;
 
-namespace FileOrganizer
+namespace MediaOrganizer
 {
     public class Configurations
     {

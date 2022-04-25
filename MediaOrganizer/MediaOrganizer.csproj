@@ -4,10 +4,10 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{1FD8C28E-1C62-41F5-9AB2-E33BFB50DC21}</ProjectGuid>
+    <ProjectGuid>{F9FE0E32-A571-401D-A21C-B4868C3D4CC7}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>FileOrganizer</RootNamespace>
-    <AssemblyName>FileOrganizer</AssemblyName>
+    <RootNamespace>MediaOrganizer</RootNamespace>
+    <AssemblyName>MediaOrganizer</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
